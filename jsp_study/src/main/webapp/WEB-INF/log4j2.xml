@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Contiguration status="INFO">
+	<Appenders>
+		<console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d - %msg%n" />
+		</console>
+	</Appenders>
+	<Loggers>
+		<Root level="INFO">
+			<AppenderRef ref="Console" ></AppenderRef>
+		</Root>
+	</Loggers>
+</Contiguration>
