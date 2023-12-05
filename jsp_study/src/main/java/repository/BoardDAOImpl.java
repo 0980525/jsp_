@@ -80,9 +80,9 @@ public class BoardDAOImpl implements BoardDAO {
 		return isOk;
 	}
 	@Override
-	public int getTotal() {
+	public int getTotal(PagingVO pgvo) {
 		// TODO Auto-generated method stub
-		return sql.selectOne("BoardMapper.tot");
+		return sql.selectOne("BoardMapper.tot",pgvo);
 	}
 
 //	@Override

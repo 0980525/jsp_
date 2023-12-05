@@ -11,20 +11,30 @@ public class PagingVO {
 		this.qty=10;
 	}
 	//페이지 네이션을 클릭하면 설정되는 값
-	public PagingVO(int pageNo, int qty) {
+	public PagingVO(int pageNo, int qty,String type,String keyword) {
 		this.pageNo=pageNo;
 		this.qty=qty;
+		this.type=type;
+		this.keyword = keyword;
 	}
 	
 	//검색 멤버변수 추가
-	private String type;//검색 대상
-	private String keyword; //검색어
+	//검색 대상 (내용,제목,작성자 등등)
+	private String type;
+	//검색어
+	private String keyword; 
 	
 	public int getPageStart() { //DB에서 사용되는 시작번지 0번지부터 시작
 		//1페이지->0, 2페이지->10 ,3페이지->20
 		return (pageNo-1)*qty;
-		
 	}
+	
+	//null이면 빈 배열로 리턴/값이 있으면 하나하나 배열로
+	public String[] getTypeToArray() {
+		return this.type == null ?
+				new String[] {} : this.type.split("");
+	}
+	
 	public int getPageNo() {
 		return pageNo;
 	}

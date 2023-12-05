@@ -21,6 +21,6 @@ public interface BoardDAO {
 
 //	int selectOne(int bno);
 
-	int getTotal();
+	int getTotal(PagingVO pgvo);
 
 }

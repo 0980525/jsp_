@@ -96,20 +96,25 @@ public class BoardController extends HttpServlet {
 				if(request.getParameter("pageNo") != null) {
 					int pageNo = Integer.parseInt(request.getParameter("pageNo"));
 					int qty = Integer.parseInt(request.getParameter("qty"));
-					log.info(">>pageNp/qty" + pageNo + qty);
-					 pgvo = new PagingVO(pageNo, qty);
+					String type=request.getParameter("type");
+					String keyword=request.getParameter("keyword");
+					log.info(">>pageNo/qty/type/keyword" + "/"+pageNo +"/"+ qty+"/"+type+"/"+keyword);
+					 pgvo = new PagingVO(pageNo, qty,type,keyword);
+					 //생성자를 바꿔서 만들었지만 set으로도 가능!
 				}
-				List<BoardVO> list = bsv.getList(pgvo);
 				//db에서 전체게시글 수 가져오기
 //				int bno = Integer.parseInt(request.getParameter("bno"));
 //				int totalCount = bsv.getCount(bno); 
-				int totalCount = bsv.getTotal(); 
+				List<BoardVO> list = bsv.getList(pgvo);
+				int totalCount = bsv.getTotal(pgvo); 
 				log.info("totalCount >>>{}" + totalCount);
 				PagingHandler ph = new PagingHandler(pgvo,totalCount);
 				//request.setAttribute("ph-객체(변수)명", ph-실제 객체);
 				
 				log.info("list>>{}"+list);
-				/* list를 jsp로 전송 */
+				/* list를 jsp로 전송 
+				 * 검색어를 반영한 리스트
+				 * */
 				request.setAttribute("list", list);
 				request.setAttribute("ph", ph);
 				

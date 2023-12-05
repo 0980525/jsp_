@@ -23,6 +23,6 @@ public interface BoardService {
 
 //	int getCount(int bno);
 
-	int getTotal();
+	int getTotal(PagingVO pgvo);
 
 }

@@ -14,7 +14,9 @@
   	values(#{title},#{writer},#{content})
   </insert>
   <select id="list" parameterType="domain.PagingVO" resultType="bvo"> <!-- mapper에 파라미터타입을 pgvo로 설정하면 mybatisconfig에서 typealias추가해줘야함 -->
-  	select * from board order by bno desc limit #{pageStart},#{qty}
+  	select * from board 
+  	<include refid="search"></include>
+  	order by bno desc limit #{pageStart},#{qty}
   </select>
   <update id="read" parameterType="int">
   	update board set readcount = readcount+1 where bno =#{bno}
@@ -32,7 +34,30 @@
 <!--   <select id="count" parameterType="int" resultType="bvo">
   select count(bno) from board
   </select> -->
-  <select id="tot" resultType="int">
+  <select id="tot" parameterType="pgvo" resultType="int">
   select count(bno) from board
+  <include refid="search"></include>
   </select>
+  <sql id="search">
+	  <if test="type != null">
+	  	<trim prefix="where (" suffix=")" prefixOverrides="or"> <!-- prefixOverrides="or" 구문 다 돌려본 후에 앞에 낀 or을 지움 -->
+	  		<foreach collection="typeToArray" item="type"> <!-- typeToArray 의 값을 하나빼서(item) type에 넣음 -->
+	  			<trim prefix="or">
+		  			<choose>
+		  				<when test="type == 't'.toString()">
+		  				<!-- concat 함수를 사용하여 이어붙이기 -->
+		  					title like concat('%',#{keyword},'%')
+		  				</when>
+		  				<when test="type == 'c'.toString()">
+		  					content like concat('%',#{keyword},'%')
+		  				</when>
+		  				<when test="type == 'w'.toString()">
+		  					writer like concat('%',#{keyword},'%')
+		  				</when>
+		  			</choose>
+	  			</trim>
+	  		</foreach>
+	  	</trim>
+	  </if>
+  </sql>
   </mapper>
