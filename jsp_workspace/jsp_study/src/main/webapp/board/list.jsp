@@ -9,7 +9,9 @@
 </head>
 <body>
 <h1>List Page</h1>
-
+<link rel="stylesheet" hreh="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  </body>"
 <!-- 검색 search line -->
 <div>
 <form action="/brd/list" method="get">
@@ -29,7 +31,7 @@
 	<input type="hidden" name="qty" value="${ph.pgvo.qty }">
 	<button type="submit">Search</button>
 
-	<span>${ph.totalCount}</span>
+	<span class="translate-middle badge rounded-pill text-bg-danger">${ph.totalCount}</span>
 </form>
 
 </div>
