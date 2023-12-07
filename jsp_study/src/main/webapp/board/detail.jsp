@@ -8,7 +8,9 @@
 <title>Detail Page</title>
 </head>
 <body>
-	
+	<div>
+	<img alt="" src="/_fileUpload/${bvo.imageFile }">
+	</div>
 <table>
 	<tr>
 		<th>번호</th>

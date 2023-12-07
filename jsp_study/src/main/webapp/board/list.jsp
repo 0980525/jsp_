@@ -9,7 +9,10 @@
 </head>
 <body>
 <h1>List Page</h1>
+<link hreh="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" rel="stylesheet" >
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
 
+  </body>"
 <!-- 검색 search line -->
 <div>
 <form action="/brd/list" method="get">
@@ -29,13 +32,16 @@
 	<input type="hidden" name="qty" value="${ph.pgvo.qty }">
 	<button type="submit">Search</button>
 
-	<span>${ph.totalCount}</span>
+	<span class="translate-middle badge rounded-pill text-bg-danger">${ph.totalCount}</span>
 </form>
 
 </div>
-
-<table border ="1">
+<div>
+	
+</div>
+<table border ="1" class="table table-hover">
 	<tr>
+		
 		<th>bno</th>
 		<th>title</th>
 		<th>writer</th>
@@ -44,14 +50,17 @@
 	</tr>
 	<!-- DB에서 가져온 리스트를 c:foreach를 통해 반복 -->
 	<c:forEach items="${list }" var="bvo">
-	<tr>
-		
-		<td><a href="/brd/detail?bno=${bvo.bno }">${bvo.bno }</a></td>
-		<td><a href="/brd/detail?bno=${bvo.bno }">${bvo.title }</a></td>
-		<td>${bvo.writer }</td>
-		<td>${bvo.regdate }</td>
-		<td>${bvo.readcount }</td>
-	</tr>
+	
+		<tr>
+			<td></td>
+			<td><a href="/brd/detail?bno=${bvo.bno }">${bvo.bno }</a></td>
+			<td><a href="/brd/detail?bno=${bvo.bno }"><img alt="" src="/_fileUpload/_th_${bvo.imageFile }">${bvo.title }</a></td>
+			
+			<td>${bvo.writer }</td>
+			<td>${bvo.regdate }</td>
+			<td>${bvo.readcount }</td>
+		</tr>
+	
 	</c:forEach>
 	
 </table>

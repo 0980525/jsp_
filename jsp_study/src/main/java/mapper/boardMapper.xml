@@ -3,41 +3,46 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
   <mapper namespace="BoardMapper">
+  
  <!--  namespace는 mapper와 연결되는 daoimpl을 연결하기 위한 이름 
   sql 구분별 생성 id를 통해 구문을 구분 daoimpl의 메서드와 연결 
   daoimpl() namespace.id BoardMapper.list
   parameterType = 매개변수 객체, resultType =결과로 나가는 객체 -->
   
-  <!-- <insert id="add" parameterType="domain.BoardVO"> -->
+  <!-- <insert id="add" parameterType="domain.BoardVO"> 로 해도 ok -->
   <insert id="add" parameterType="bvo">
-  insert into board(title,writer,content)
-  	values(#{title},#{writer},#{content})
+  insert into board(title,writer,content,imageFile)
+  	values(#{title},#{writer},#{content},#{imageFile})
   </insert>
+  
   <select id="list" parameterType="domain.PagingVO" resultType="bvo"> <!-- mapper에 파라미터타입을 pgvo로 설정하면 mybatisconfig에서 typealias추가해줘야함 -->
   	select * from board 
   	<include refid="search"></include>
   	order by bno desc limit #{pageStart},#{qty}
   </select>
+  
   <update id="read" parameterType="int">
   	update board set readcount = readcount+1 where bno =#{bno}
   </update>
+  
   <select id="detail" parameterType="int" resultType="bvo">
   	select*from board where bno = #{bno}
   </select>
+  
   <update id="up" parameterType="bvo">
-  	update board set title=#{title},content=#{content}, moddate=now()
+  	update board set title=#{title},content=#{content}, moddate=now(), imageFile=#{imageFile}
 		where bno=#{bno}
   </update>
+  
   <delete id="del" parameterType="int">
   delete from board where bno=#{bno}
   </delete>
-<!--   <select id="count" parameterType="int" resultType="bvo">
-  select count(bno) from board
-  </select> -->
+  
   <select id="tot" parameterType="pgvo" resultType="int">
   select count(bno) from board
   <include refid="search"></include>
   </select>
+  
   <sql id="search">
 	  <if test="type != null">
 	  	<trim prefix="where (" suffix=")" prefixOverrides="or"> <!-- prefixOverrides="or" 구문 다 돌려본 후에 앞에 낀 or을 지움 -->

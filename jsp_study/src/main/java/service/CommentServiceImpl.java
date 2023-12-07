@@ -31,9 +31,20 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
-	public int remove(String cno) {
-		// TODO Auto-generated method stub
+	public int remove(int cno) {
+		log.info("comment remove check 2");
 		return cdao.delete(cno);
 	}
+
+	@Override
+	public int modify(CommentVO cvo) {
+		// TODO Auto-generated method stub
+		return cdao.update(cvo);
+	}
+
+	
+
+	
+
 	
 }

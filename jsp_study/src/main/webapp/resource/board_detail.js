@@ -18,24 +18,33 @@ async function getCommentListFromServer(bno){
 function spreadCommentList(result){ //result => 댓글 리스트
     console.log(result);
     let div = document.getElementById("commentline");
+    
     console.log(div);
     div.innerHTML="";//원래 만들어 뒀던 구조 지우기
     //값이 여러개 들어올 예정
+    let writer = document.getElementById('cmtWriter').value;
+   
     for(let i=0;i<result.length;i++){
-
+        
         let html = `<div>`;
         html += `<div> ${result[i].cno}, ${result[i].bno}, ${result[i].writer}, ${result[i].regdate} </div>`;
         html += `<div>`;
+        if(writer == result[i].writer){
         html += `<button type="button" data-cno=${result[i].cno} class="cmtModBtn"> 수정 </button>`; // 수정하기 위해서 cno 데이터값이 필요
         html += `<button type="button" data-cno=${result[i].cno} class="cmtDelBtn"> 삭제 </button> <br>`;
+		}
         html += `<input type="text" value="${result[i].content}" class="cmtText">`;
-        html += `</div> </div>`;
+        html += `</div> </div><br><hr>`;
 
         div.innerHTML += html; //각 댓글 객체를 누적해서 담기
+
+       
     }  
     
 
 }
+
+
 
 function printCommentList(bno){
     getCommentListFromServer(bno).then(result=>{
@@ -119,7 +128,7 @@ async function removeCommentFromServer(cnoVal){
     try {
         const url= '/cmt/remove?cnoVal='+cnoVal;
         const resp= await fetch(url);
-        const result = resp.text();
+        const result = await resp.text();
         return result;
     } catch (error) {
         console.log(error);
@@ -136,9 +145,25 @@ document.addEventListener('click',(e)=>{ //전체를 타겟으로 활성화
             //result = isOk
             if(result > 0){
                 alert('댓글 삭제 성공~');
-                printCommentList(cnoVal);
+                printCommentList(bnoVal);
+            }
+        })
+    }
+    if(e.target.classList.contains('cmtModBtn')){
+        let cnoVal = e.target.dataset.cno;
+        console.log(cnoVal);
+        //html에 있는 cmtText 가져오기
+        let div = e.target.closest('div'); //타겟(cmtModBtn)을 기준으로 가장 가까운 div찾기
+        let cmtText = div.querySelector('.cmtText').value; //해당 div의 querySelect로 .cmtText클래스를 가지고있는 value 값
+        console.log("cmtText >>>"+cmtText);
+        updateCommentFromServer(cnoVal,cmtText).then(result=>{ //result = isOk
+            console.log(result);
+            if(result > 0){
+                alert('댓글 수정 성공~');
+                printCommentList(bnoVal);
             }
         })
     }
 
 })
+

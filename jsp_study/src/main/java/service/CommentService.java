@@ -10,6 +10,10 @@ public interface CommentService {
 
 	List<CommentVO> getList(int bno);
 
-	int remove(String cno);
+	int remove(int cno);
+
+	int modify(CommentVO cvo);
+
+	
 
 }

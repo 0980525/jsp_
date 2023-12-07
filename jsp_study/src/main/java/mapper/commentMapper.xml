@@ -7,9 +7,13 @@
     insert into comment(bno,writer,content) values(#{bno},#{writer},#{content})
     </insert>
     <select id="list" resultType="cvo">
-    select * from comment where bno =#{bno} 
+    select * from comment where bno =#{bno} order by cno desc
     </select>
-    <delete id="del" parameterType="String">
+    <delete id="del" >
     delete from comment where cno=#{cno}
     </delete>
+    <update id="mod" >
+    update comment set content=#{content}, regdate=now() where cno=#{cno}
+     
+    </update>
     </mapper>

@@ -37,10 +37,20 @@ public class CommentDAOImpl implements CommentDAO {
 	}
 
 	@Override
-	public int delete(String cno) {
+	public int delete(int cno) {
 		log.info("comment remove check 3");
 		isOk=sql.delete("CommentMapper.del",cno);
 		if(isOk>0) sql.commit();
 		return isOk;
 	}
+
+	@Override
+	public int update(CommentVO cvo) {
+		log.info("comment update check 3");
+		isOk = sql.update("CommentMapper.mod",cvo);
+		if(isOk>0)sql.commit();
+		return isOk;
+	}
+
+	
 }

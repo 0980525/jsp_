@@ -126,8 +126,9 @@ public class CommemtController extends HttpServlet {
 			break; 
 		case "remove":
 			try {
-				String cno = request.getParameter("cnoVal");
+				int cno = Integer.parseInt(request.getParameter("cnoVal")) ;
 				isOk = csv.remove(cno);
+				log.info("comment remove >> {} "+(isOk>0?"ok":"fail"));
 				PrintWriter out = response.getWriter();
 				out.print(isOk);
 			} catch (Exception e) {
@@ -137,7 +138,43 @@ public class CommemtController extends HttpServlet {
 			
 			
 			break; 
-//		case "": break; 
+		case "modify": 
+			try {
+				//js 에서 json 으로 데이터 받는거 
+						//js에서 보낸 데이터를 읽어들이는 작업 (js->controller) String 으로 보내서 StringBuffer로 받아야함
+							StringBuffer sb = new StringBuffer();
+							String line = null;
+							//buffer읽어오는 reader(json읽음)/ 보낼 writer있어야함
+							BufferedReader br= request.getReader(); //댓글 객체
+							
+							while((line = br.readLine()) != null) { //한줄씩 읽음
+								sb.append(line); //line에 한줄씩 읽은 거 추가
+							}
+							log.info(">>>>>String Buffer<<<<<"+sb.toString());
+						// commentVO객체로 생성
+							JSONParser parser = new JSONParser(); //sb.toString 값을 parsing 해서 (text)->json 변경 
+							JSONObject jsonObj = (JSONObject)parser.parse(sb.toString()); //json object형태로 변환 //key:value 형태
+				
+				//key 를 이용햐여 value 를 추출
+				int cno = Integer.parseInt(jsonObj.get("cno").toString());
+				String content = jsonObj.get("content").toString();
+				CommentVO cvo = new CommentVO(cno, content);
+				log.info("commentVO >>> {} "+ cvo); //들어온거 확인
+				
+			//csv한테 등록하라고 보내기
+				isOk=csv.modify(cvo);
+				log.info("isOk >> "+((isOk>0)? "ok":"fail"));
+				
+			//결과데이터 전송 => 화면에 출력 (response 객체의 body에 기록)
+				PrintWriter out = response.getWriter();
+				out.print(isOk);
+				
+//				
+			} catch (Exception e) {
+				e.printStackTrace();
+				log.info("modify error");
+			}
+			break; 
 //		case "": break; 
 		}
 	}
