@@ -1,5 +1,5 @@
 
-
+--2023-11-23
 CREATE TABLE `board` (
   `bno` int NOT NULL AUTO_INCREMENT,
   `title` varchar(200) NOT NULL,
@@ -27,4 +27,6 @@ writer varchar(100) default "unknown",
 content varchar(1000) not null,
 regdate datetime default now(),
 primary key(cno));
+--20203-12-07
+alter table board add imageFile varchar(100);
     

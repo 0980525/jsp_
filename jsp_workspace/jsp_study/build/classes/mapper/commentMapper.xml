@@ -16,4 +16,8 @@
     update comment set content=#{content}, regdate=now() where cno=#{cno}
      
     </update>
+    
+     <delete id="delAll" >
+    delete from comment where bno=#{bno}
+    </delete>
     </mapper>

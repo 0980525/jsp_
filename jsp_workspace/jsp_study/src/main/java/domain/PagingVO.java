@@ -16,8 +16,11 @@ public class PagingVO {
 		this.qty=qty;
 		this.type=type;
 		this.keyword = keyword;
+		
 	}
 	
+	
+
 	//검색 멤버변수 추가
 	//검색 대상 (내용,제목,작성자 등등)
 	private String type;

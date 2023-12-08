@@ -9,6 +9,8 @@ import domain.BoardVO;
 import domain.PagingVO;
 import repository.BoardDAO;
 import repository.BoardDAOImpl;
+import repository.CommentDAO;
+import repository.CommentDAOImpl;
 
 public class BoardServiceImpl implements BoardService {
 
@@ -17,8 +19,10 @@ public class BoardServiceImpl implements BoardService {
 	
 	private BoardDAO bdao;//interface로 생성
 	
+	private CommentDAOImpl cdao = new CommentDAOImpl();
 	public BoardServiceImpl() {
 		bdao = new BoardDAOImpl();
+		
 	}
 
 	@Override
@@ -53,6 +57,7 @@ public class BoardServiceImpl implements BoardService {
 	public int remove(int bno) {
 		log.info("2");
 		
+		cdao.deleteAll(bno);
 		return bdao.delete(bno);
 	}
 
@@ -62,9 +67,5 @@ public class BoardServiceImpl implements BoardService {
 		return bdao.getTotal(pgvo);
 	}
 
-//	@Override
-//	public int getCount(int bno) {
-//		// TODO Auto-generated method stub
-//		return bdao.selectOne(bno);
-//	}
+
 }

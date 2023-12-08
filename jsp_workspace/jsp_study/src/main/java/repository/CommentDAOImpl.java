@@ -53,4 +53,14 @@ public class CommentDAOImpl implements CommentDAO {
 	}
 
 	
+
+	@Override
+	public int deleteAll(int bno) {
+		log.info("comment removeAll check 3");
+		isOk=sql.delete("CommentMapper.delAll",bno);
+		sql.commit();
+		return isOk;
+	}
+
+	
 }
