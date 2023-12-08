@@ -43,5 +43,25 @@
 <a href="/brd/modify?bno=${bvo.bno }"><button>수정</button></a>
 <a href="/brd/remove?bno=${bvo.bno }"><button>삭제</button></a>
 </c:if>
+<a href="/brd/list"><button>list로 가기</button></a>
+<hr>
+<!-- 댓글 표시 라인 -->
+<div id="commentline">
+	<div>
+		<div> cno,bno,writer,regdate</div>
+		<div>
+			<button>수정</button><button>삭제</button><br>
+			<input value="content">
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	const bnoVal = `<c:out value="${bvo.bno}"/>`
+	console.log(bnoVal);
+</script>
+<script src="/resource/board_detail.js"></script>
+<script type="text/javascript">
+	printCommentList(bnoVal);
+</script>
 </body>
 </html>

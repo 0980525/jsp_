@@ -7,12 +7,13 @@ import org.slf4j.LoggerFactory;
 
 import controller.BoardController;
 import domain.BoardVO;
+import domain.PagingVO;
 import repository.BoardDAO;
 import repository.BoardDAOImpl;
 
 public class BoardServiceImpl implements BoardService {
 	
-	private static final Logger log = LoggerFactory.getLogger(BoardController.class);
+	private static final Logger log = LoggerFactory.getLogger(BoardServiceImpl.class);
 
 	private BoardDAO bdao;
 	
@@ -46,8 +47,13 @@ public class BoardServiceImpl implements BoardService {
 	}
 	@Override
 	public List<BoardVO> chList(String id) {
-		// TODO Auto-generated method stub
+		
 		return bdao.selectList(id);
+	}
+	@Override
+	public int getTotal(PagingVO pgvo) {
+		
+		return bdao.getTotal(pgvo);
 	}
 	
 

@@ -6,13 +6,14 @@ import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import controller.BoardController;
+
 import domain.BoardVO;
+import domain.PagingVO;
 import orm.DatabaseBuilder;
 
 public class BoardDAOImpl implements BoardDAO {
 
-	private static final Logger log = LoggerFactory.getLogger(BoardController.class);
+	private static final Logger log = LoggerFactory.getLogger(BoardDAOImpl.class);
 //DB연결 
 	private SqlSession sql;
 	
@@ -60,6 +61,12 @@ public class BoardDAOImpl implements BoardDAO {
 	public List<BoardVO> selectList(String id) {
 		
 		return sql.selectList("BoardMapper.mylist",id);
+	}
+
+	@Override
+	public int getTotal(PagingVO pgvo) {
+		
+		return sql.selectOne("BoardMapper.tot",pgvo);
 	}
 
 	

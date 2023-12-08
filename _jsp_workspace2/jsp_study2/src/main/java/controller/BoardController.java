@@ -1,5 +1,6 @@
 package controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -11,11 +12,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import domain.BoardVO;
 import domain.MemberVO;
+import domain.PagingVO;
+import handler.PagingHandler;
+import net.coobird.thumbnailator.Thumbnails;
 import service.BoardService;
 import service.BoardServiceImpl;
 
@@ -32,6 +39,9 @@ public class BoardController extends HttpServlet {
 	private String destPage;
 	//DB구문 체크 값 저장 변수
 	private int isOk;
+	
+	//파일 저장 경로를 저장하는 변수 
+	private String savePath;
 	
 	//controller랑 service 연결 변수 (interface로 생성)
 	private BoardService bsv;
@@ -61,17 +71,60 @@ public class BoardController extends HttpServlet {
 			destPage="/board/register.jsp";
 			break;
 		case "insert":
-			//.jsp에서 제목,작성자,내용 요청해서 받아옴, 
-			//받은자료로 BoardVO bvo생성, 
-			//service한테 bvo매개변수로 토스-> DB에 저장됨, 
-			//실행 후 페이지이동 
+			//jsp에서 가져온 제목,작성자,내용 꺼내오기(경로확인,파라미터확인 =>try catch)
 			try {
-				String title = request.getParameter("title");
-				String writer = request.getParameter("writer");
-				String content = request.getParameter("content");
-				log.info("insert check 1 ");
+				savePath = getServletContext().getRealPath("/_fileUpload");
+				//임시저장 위치 fileDir
+				File fileDir = new File(savePath);
+				log.info("저장 위치 :>> "+savePath);
+				DiskFileItemFactory fileItemFactory = new DiskFileItemFactory();
 				
-				BoardVO bvo = new BoardVO(title,writer,content);
+				fileItemFactory.setRepository(fileDir);
+				fileItemFactory.setSizeThreshold(1024*1024*3);
+				
+				BoardVO bvo = new BoardVO();
+				ServletFileUpload fileUpload = new ServletFileUpload(fileItemFactory);
+				List<FileItem> itemList = fileUpload.parseRequest(request);
+				for(FileItem item : itemList) {
+					switch(item.getFieldName()) {
+					case "title": bvo.setTitle(item.getString("utf-8"));
+					break;
+					case "writer" : bvo.setWriter(item.getString("utf-8"));
+					break;
+					case "content" : bvo.setContent(item.getString("utf-8"));
+					break;
+					case "image_file" : 
+						//이미지 있는지 체크
+						if(item.getSize() > 0) {//값이 0이면 없음
+							//파일 이름.file에서 이름만 분리
+							String fileName = item.getName().substring(item.getName().lastIndexOf("/")+1);
+							//파일이름이 같을 경우 구분을 위한 시간 삽입
+							fileName = System.currentTimeMillis()+"_"+fileName;
+							//uploadFilePath 생성 파일 경로+파일 경로구분separator+파일 이름
+							File uploadFilePath = new File(fileDir+File.separator+fileName);
+							//toString 으로 경로 확인 로그찍기
+							log.info("uploadFilePath >> "+uploadFilePath.toString());
+							
+							//저장
+							try {
+								//자바객체를 디스크에 씀 -디스크에 쓰는 이유 : 디스크가 아니라 메모리에만 저장하면 서버가 재시작될 때 파일이 손실될 수 있어서 
+								item.write(uploadFilePath);
+								//bvo에 저장할 값 설정
+								bvo.setImageFile(fileName);
+								
+								//thumbnails 썸네일 작업 : 전체리스트 페이지에서 트래픽 과다사용 방지용
+								Thumbnails.of(uploadFilePath)
+									.size(75, 75)
+									.toFile(new File(fileDir+File.separator+"th_"+fileName));
+								
+							} catch (Exception e) {
+								log.info(">>file writer on disk error");
+								e.printStackTrace();
+							}
+						}
+						} //switch
+					break;
+				}//for
 				
 				isOk = bsv.register(bvo);
 				log.info("board register >> ",isOk>0? "ok":"fail");
@@ -84,11 +137,28 @@ public class BoardController extends HttpServlet {
 			break;
 		case "list":
 			try {
+				PagingVO pgvo = new PagingVO();
+				if(request.getParameter("pageNo")!= null) {
+					int pageNo = Integer.parseInt(request.getParameter("pageNo"));
+					int qty = Integer.parseInt(request.getParameter("qty"));
+					String type = request.getParameter("type");
+					String keyword = request.getParameter("keyword");
+					log.info(">>pageNo/qty/type/keyword/"+pageNo+"/"+qty+"/"+type+"/"+keyword);
+					pgvo = new PagingVO(pageNo,qty,type,keyword);
+				}
+				
 				//리스트 생성후 서비스한테 토스(서비스가 할 일->DB에서 전체 리스트 조회 -> 전체리스트 ->.jsp에 뿌려주기)
 				//list를 요청
 				//list.jsp로 페이지 이동 
 				List<BoardVO> list = bsv.getlist();
+				int totalCount = bsv.getTotal(pgvo);
+				log.info("totalCount >> {}"+totalCount);
+				PagingHandler ph = new PagingHandler(pgvo,totalCount);
+				log.info("list>>{}"+list);
+				
 				request.setAttribute("list", list);
+				request.setAttribute("ph", ph);
+				
 				destPage="/board/list.jsp";
 			} catch (Exception e) {
 				log.info("list error");
@@ -131,19 +201,39 @@ public class BoardController extends HttpServlet {
 			break;
 		case "edit":
 			try {
-				//파라미터로 받은 bno, title,content데이터를 DB에 수정하여 넣고 list로 이동 
-				//수정한 값은 새로 bvo에 넣어서 bsv한테 토스->DB에 저장
-				int bno = Integer.parseInt(request.getParameter("bno"));
-				String title = request.getParameter("title");
-				String content = request.getParameter("content");
+				savePath = getServletContext().getRealPath("/_fileUpload");
+				File fileDir = new File(savePath);
 				
-				BoardVO bvo = new BoardVO(bno,title,content);
-				isOk = bsv.modify(bvo);
-				destPage="list";
+				DiskFileItemFactory fileItemFactory = new DiskFileItemFactory();
+				fileItemFactory.setRepository(fileDir);
+				fileItemFactory.setSizeThreshold(3*1024*1024);
+				
+				BoardVO bvo = new BoardVO();
+				
+				ServletFileUpload fileUpload = new ServletFileUpload(fileItemFactory);
+				
+				List<FileItem> itemList = fileUpload.parseRequest(request);
+				String old_file = null;
+				
+				for(FileItem item : itemList) {
+					switch(item.getFieldName()) {
+					case "bno" : bvo.setBno(Integer.parseInt(item.getString("utf-8")));
+						break;
+					case "title" : 
+						break;
+					case "content" : 
+						break;
+					case "image_file" : 
+						break;
+					case "new_file" : 
+						break;
+					}
+				}
 				
 			} catch (Exception e) {
-				e.printStackTrace();
 				log.info("edit error");
+				e.printStackTrace();
+			
 			}
 			
 			break;
